@@ -38,4 +38,6 @@ That is regarding the icon appearance. The actions against the page(s) should be
 
 As options:
 
-1. It should be possible to indicate which domain to manage (alternatively, which list of domains). 
+1. It should be possible to indicate which domain to manage (alternatively, which list of domains).
+
+I'm currently trying to put some kind of skeleton together, but ideally I should inspect the [API reference](https://developer.chrome.com/extensions/api_index) so that I can choose the appropriate calls.

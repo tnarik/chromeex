@@ -13,15 +13,12 @@ chrome.runtime.onInstalled.addListener(function() {
    });
 
    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-      var tracked_domain;
       chrome.storage.sync.get('tracked_domain', function(data) {
-         tracked_domain = data.tracked_domain;
-
-         console.log(tracked_domain);
+         console.log(data.tracked_domain);
 
          chrome.declarativeContent.onPageChanged.addRules([{
             conditions: [new chrome.declarativeContent.PageStateMatcher({
-               pageUrl: {hostEquals: tracked_domain}
+               pageUrl: {hostEquals: data.tracked_domain}
             })],
           actions: [new chrome.declarativeContent.ShowPageAction()]
          }]);

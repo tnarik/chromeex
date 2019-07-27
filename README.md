@@ -22,3 +22,20 @@ Reload the exension via the extension management page (the refresh icon).
 I'm not yet sure how does the icon in the toolbar works with the popup (the fact that it appears disabled or not). I imagine it is part of the popup interface behaviour, but will prefer reading about it.
 
 ### Next stop [https://developer.chrome.com/extensions/overview](https://developer.chrome.com/extensions/overview)
+
+The background script is the extension event handler, it is said.
+
+My extension doesn't need to modify or read the content of the page (I think). It should just activate when in the right domain and then:
+
+1. Offer the option to download/sync the page
+2. Indicate if the page was already sync'ed
+3. Indicate if there is some mismatch (either the available page or the corresponding downloaded data is newer).
+
+That is regarding the icon appearance. The actions against the page(s) should be:
+
+1. Storing the list of pages supported/sync'ed/tracked
+2. Obtain page data/update the page using the REST APIs
+
+As options:
+
+1. It should be possible to indicate which domain to manage (alternatively, which list of domains). 

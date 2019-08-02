@@ -15,16 +15,23 @@ chrome.runtime.onInstalled.addListener(function() {
    });
 
    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-      chrome.browserAction.setBadgeText({"text": "1"}, null);
+      //chrome.browserAction.setBadgeText({"text": "1"}, null);
       chrome.storage.sync.get('tracked_domain', function(data) {
          console.log(data.tracked_domain);
 
-         chrome.declarativeContent.onPageChanged.addRules([{
-            conditions: [new chrome.declarativeContent.PageStateMatcher({
-               pageUrl: {hostEquals: data.tracked_domain}
-            })],
-          actions: [new chrome.declarativeContent.ShowPageAction()]
-         }]);
+         var rule_active = {
+            conditions: [
+               new chrome.declarativeContent.PageStateMatcher({
+                  pageUrl: {hostEquals: data.tracked_domain}
+               }),
+               new chrome.declarativeContent.PageStateMatcher({
+                  pageUrl: {hostEquals: "bombmagazine.org"}
+               })
+            ],
+            actions: [new chrome.declarativeContent.ShowPageAction()]
+         }
+
+         chrome.declarativeContent.onPageChanged.addRules([rule_active]);
       });
    });
 });

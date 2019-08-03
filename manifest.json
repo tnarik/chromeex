@@ -8,7 +8,7 @@
         "48": "images/get_started48.png",
         "128": "images/get_started128.png"
     },
-    "permissions": ["webNavigation", "activeTab", "declarativeContent", "storage"],
+    "permissions": ["webNavigation", "activeTab", "declarativeContent", "storage", "notifications"],
     //"omnibox": {"keyword": "cnf"}, // Would listen to omnibox.onInputEntered
     "page_action": {
         "default_title": "keep track of those pesky Confluence pages",
@@ -24,6 +24,9 @@
         "scripts": ["background.js"],
         "persistent": false
     },
-    "options_page": "options.html",
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": true
+    },
     "manifest_version": 2
 }

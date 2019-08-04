@@ -14,6 +14,21 @@ chrome.runtime.onInstalled.addListener(function() {
       console.log("domain tracked");
    });
 
+   let thingies = [
+      {
+         url: 'developer.chrome.com',
+         path: "path1"
+      },
+      {
+         url: 'bombmagazine.org',
+         path: "path2"
+      }
+   ]
+
+   chrome.storage.sync.set({thingies: thingies}, function() {
+      console.log("thingies added");
+   });
+
    chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
       //chrome.browserAction.setBadgeText({"text": "1"}, null);
       chrome.storage.sync.get('tracked_domain', function(data) {

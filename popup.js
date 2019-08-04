@@ -1,6 +1,7 @@
 let changeColor = document.getElementById('changeColor');
 let showFolder = document.getElementById('showFolder');
 let dload = document.getElementById('dload');
+let dload_dload = document.getElementById('dload_dload');
 
 chrome.storage.sync.get('color', function(data) {
    changeColor.style.backgroundColor = data.color;
@@ -63,3 +64,18 @@ dload.onclick = function(element) {
   document.body.appendChild(a);
   a.click();
 };
+
+dload_dload.onclick = function(element) {
+  multilog('dlowad appendChild');
+
+  var text = "Some sample text, as an exercise";
+  var file = new Blob([text], {type: 'text/plain'}); // but could even be 'somethingelse'
+  var url = URL.createObjectURL(file);
+
+  chrome.downloads.download(
+    { url: url,
+      filename: "sample_using_downloads.txt",
+      saveAs: false },
+    function(id) {});
+};
+

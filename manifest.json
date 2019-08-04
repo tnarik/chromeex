@@ -2,6 +2,7 @@
     "name": "Tutorial based extension",
     "version": "1.0",
     "description": "Building an Extension using the tutorial from Chrome Developer Portal",
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArV4s6W8oPVEUmo6IJayEI++HE1GXjybz+XPq4ySEesbQR+4JpKQ9dVt68Q1otHISP1RYDA5T0lm02DJn13820uch8ckvf3GBncbuNywBIOAZDoHUTE1nlGXicYbmq7xR7Fx8gQ+e5WWu9AoTwjS6oEszUO5j4fT19kzxWL8S125Y6OWFRvwxx30Wg1M6/6G6MttAHSPO9PpE98yv4d96P+VsLTF6w3vmKt7xAWdq4C7TyqK3FNtNkf8ymznhPTxgzWimA+63Z6nsshuNPWOs+lvGu79qLNU4WbW6iYjxvT16OvZb+U1hW9pfDxXpGGiUQDroOVt8jj/34xgwMsW2oQIDAQAB",
     "icons": {
         "16": "images/get_started16.png",
         "32": "images/get_started32.png",

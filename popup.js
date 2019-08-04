@@ -2,6 +2,7 @@ let changeColor = document.getElementById('changeColor');
 let showFolder = document.getElementById('showFolder');
 let dload = document.getElementById('dload');
 let dload_dload = document.getElementById('dload_dload');
+let talk_app = document.getElementById('talk_app');
 
 chrome.storage.sync.get('color', function(data) {
    changeColor.style.backgroundColor = data.color;
@@ -11,7 +12,9 @@ chrome.storage.sync.get('color', function(data) {
 
 let multilog = function(message) {
   // Background page
-  chrome.extension.getBackgroundPage().console.log(message);
+  //if ( chrome.extension.getBackgroundPage().console !== undefined ) {
+    chrome.extension.getBackgroundPage().console.log(message);
+  //}
 
   // OS notification
   chrome.notifications.create('', {
@@ -66,7 +69,7 @@ dload.onclick = function(element) {
 };
 
 dload_dload.onclick = function(element) {
-  multilog('dlowad appendChild');
+  multilog('dload appendChild');
 
   var text = "Some sample text, as an exercise";
   var file = new Blob([text], {type: 'text/plain'}); // but could even be 'somethingelse'
@@ -78,4 +81,10 @@ dload_dload.onclick = function(element) {
       saveAs: false },
     function(id) {});
 };
+
+talk_app.onclick = function(element) {
+  multilog('talk to app');
+  chrome.runtime.sendMessage('njammkdfbnolefjpfnckcdcbgafjggkb', { launch: true });
+};
+
 

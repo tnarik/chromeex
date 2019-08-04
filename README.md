@@ -41,3 +41,20 @@ As options:
 1. It should be possible to indicate which domain to manage (alternatively, which list of domains).
 
 I'm currently trying to put some kind of skeleton together, but ideally I should inspect the [API reference](https://developer.chrome.com/extensions/api_index) so that I can choose the appropriate calls.
+
+### A fixed ID during development, via a Private Key
+
+A `key.pem` is generated, and the corresponding public key and calculated Id printed out for use.
+
+The `key.pem.donotdistribute` name is to avoid having to remove/move it when using the unpacked extension while keeping the logs error free.
+
+```
+# create Private Key
+2>/dev/null openssl genrsa 2048 | openssl pkcs8 -topk8 -nocrypt -out key.pem.donotdistribute
+# 'key' in manifest.json
+2>/dev/null openssl rsa -in key.pem.donotdistribute -pubout -outform DER | openssl base64 -A
+# extension ID
+2>/dev/null openssl rsa -in key.pem.donotdistribute -pubout -outform DER |  shasum -a 256 | head -c32 | tr 0-9a-f a-p
+
+# add to the manifest a 'key' : 'publicKey value'
+```

@@ -3,6 +3,7 @@ let showFolder = document.getElementById('showFolder');
 let dload = document.getElementById('dload');
 let dload_dload = document.getElementById('dload_dload');
 let talk_app = document.getElementById('talk_app');
+let talk_native = document.getElementById('talk_native');
 
 chrome.storage.sync.get('color', function(data) {
    changeColor.style.backgroundColor = data.color;
@@ -87,4 +88,18 @@ talk_app.onclick = function(element) {
   chrome.runtime.sendMessage('njammkdfbnolefjpfnckcdcbgafjggkb', { launch: true });
 };
 
+talk_native.onclick = function(element) {
+  multilog('talk to native');
 
+  //var port = chrome.runtime.connectNative('uk.co.lecafeautomatique.confla');
+  chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
+    { text: "Hello" },
+    function(response) {
+      if (response !== undefined) {
+        console.log("Received " + response);
+        console.log(response);
+      } else {
+        console.error(chrome.runtime.lastError);
+      }
+    });
+};

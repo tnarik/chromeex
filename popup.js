@@ -92,14 +92,17 @@ talk_native.onclick = function(element) {
   multilog('talk to native');
 
   //var port = chrome.runtime.connectNative('uk.co.lecafeautomatique.confla');
-  chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
-    { text: "Hello" },
-    function(response) {
-      if (response !== undefined) {
-        console.log("Received " + response);
-        console.log(response);
-      } else {
-        console.error(chrome.runtime.lastError);
-      }
-    });
+  chrome.storage.sync.get('test', result => {
+    chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
+      //{ text: "Hello" },
+      result.test,
+      function(response) {
+        if (response !== undefined) {
+          console.log("Received " + response);
+          console.log(response);
+        } else {
+          console.error(chrome.runtime.lastError);
+        }
+      })
+  })
 };

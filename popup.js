@@ -11,6 +11,8 @@ chrome.storage.sync.get('color', function(data) {
    changeColor.setAttribute('value', data.color);
 });
 
+let new_conflu = document.getElementById('new_conflu')
+new_conflu.style.display = 'block';
 
 let multilog = function(message) {
   // Background page might not be active
@@ -111,6 +113,9 @@ talk_native.onclick = function(element) {
 add_this.onclick = function(element) {
   multilog('adding a host');
 
+  let username = document.getElementById('username').value;
+  let password = document.getElementById('password').value;
+  multilog(`username ${username} and password ${password}`)
 
   chrome.storage.sync.get('hosts', result => {
     hh = result.hosts || []

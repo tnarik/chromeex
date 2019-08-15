@@ -9,7 +9,9 @@
         "48": "images/get_started48.png",
         "128": "images/get_started128.png"
     },
-    "permissions": ["webNavigation", "nativeMessaging", "activeTab", "declarativeContent", "storage", "notifications", "downloads"],
+    "permissions": ["webNavigation", "nativeMessaging", "activeTab",
+                    "tabs",
+                    "declarativeContent", "storage", "notifications", "downloads"],
     //"omnibox": {"keyword": "cnf"}, // Would listen to omnibox.onInputEntered
 //    "page_action": {
     "browser_action": {

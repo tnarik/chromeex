@@ -43,7 +43,10 @@ chrome.runtime.onInstalled.addListener(function() {
                   pageUrl: {hostEquals: "bombmagazine.org"}
                })
             ],
-            actions: [new chrome.declarativeContent.ShowPageAction()]
+            actions: [
+               //console.log("matched URL")
+               //new chrome.declarativeContent.ShowPageAction()
+            ]
          }
 
          chrome.declarativeContent.onPageChanged.addRules([rule_active]);
@@ -55,6 +58,38 @@ chrome.runtime.onInstalled.addListener(function() {
 //
 // It seems there is no webNavigation. ??? It just needed permissions.
 //
-chrome.webNavigation.onCompleted.addListener(function() {
-   console.log("oohh, a tab loaded!");
-}, {url: [{hostEquals : 'developer.chrome.com'}]});
+//chrome.webNavigation.onCompleted.addListener(function() {
+//   console.log("oohh, a tab loaded!");
+//   console.log("matched URL")
+//   chrome.browserAction.setIcon({path: {"16": "images/get_started16_grey.png"}})
+//  
+//}, {url: [{hostEquals : 'developer.chrome.com'}]});
+
+//chrome.tabs.onUpdated.addListener(function(tab, info) {
+//   console.log("TAB UPDATED")
+//   console.log(tab)
+//   console.log(info)
+//   console.log(info.url)
+//   chrome.tabs.get(tab, (t) => {
+//      console.log(t)
+//   })
+//});
+
+chrome.tabs.onActivated.addListener((data) => {
+   console.log(data)
+   chrome.tabs.get(data.tabId, (t) => {
+      console.log(t)
+      if (t.url.indexOf('a') == -1) {
+         chrome.browserAction.setIcon({path: {"16": "images/get_started16_grey.png"}})
+         chrome.browserAction.setBadgeText({"text": ""}, null);
+      } else {
+         chrome.browserAction.setIcon({path: {"16": "images/get_started16.png"}})
+         chrome.browserAction.setBadgeText({"text": `${t.url.indexOf('a')}`}, null);
+      }
+   })
+   //chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+   //   console.log(`updated ${tabId}`);
+   //   console.log(changeInfo)
+   //   console.log(tab)
+   //});
+})

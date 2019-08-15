@@ -4,18 +4,28 @@
       <style>
         button {
           height: 30px;
-          //width: 30px;
+          width: 30px;
           outline: none;
+        }
+        button.new {
+          width: 100%;
+          outline: none;
+        }
+        body {
+          width: 130px;
         }
       </style>
     </head>
     <body>
+      <div>This page is to be added to tracking.</div>
+      <div>that means adding the host AND the page.</div>
+      <button class="new" id="add_this">add this</button>
+      <button class="new" id="talk_native">talk to native app</button>
       <button id="changeColor"></button>
       <button id="showFolder">show</button>
       <button id="dload">ext save</button>
       <button id="dload_dload">ext dload</button>
       <button id="talk_app">talk to app</button>
-      <button id="talk_native">talk to native</button>
       <script src="popup.js"></script>
       <p>4 UMLs</p>
     </body>

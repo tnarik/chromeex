@@ -4,6 +4,7 @@ let dload = document.getElementById('dload');
 let dload_dload = document.getElementById('dload_dload');
 let talk_app = document.getElementById('talk_app');
 let talk_native = document.getElementById('talk_native');
+let add_this = document.getElementById('add_this');
 
 chrome.storage.sync.get('color', function(data) {
    changeColor.style.backgroundColor = data.color;
@@ -12,17 +13,17 @@ chrome.storage.sync.get('color', function(data) {
 
 
 let multilog = function(message) {
-  // Background page
-  //if ( chrome.extension.getBackgroundPage().console !== undefined ) {
+  // Background page might not be active
+  if ( chrome.extension.getBackgroundPage() !== undefined ) {
     chrome.extension.getBackgroundPage().console.log(message);
-  //}
+  }
 
   // OS notification
   chrome.notifications.create('', {
     type: 'basic',
     iconUrl: 'images/get_started32.png',
-    title: message,
-    message: "ext "+message
+    title: JSON.stringify(message),
+    message: "ext "+JSON.stringify(message)
   }, function(notificationId) {});
 
   // main tab
@@ -31,7 +32,7 @@ let multilog = function(message) {
     function(tabs) {
       chrome.tabs.executeScript(
         tabs[0].id,
-        {code: "console.log('"+message+"');"});
+        {code: "console.log('"+JSON.stringify(message)+"');"});
   });
 };
 
@@ -104,5 +105,29 @@ talk_native.onclick = function(element) {
           console.error(chrome.runtime.lastError);
         }
       })
+  })
+};
+
+add_this.onclick = function(element) {
+  multilog('adding a host');
+
+
+  chrome.storage.sync.get('hosts', result => {
+    hh = result.hosts || []
+    multilog(hh)
+
+  multilog(`hh ${hh}`)
+  hh.push('this one')
+  chrome.storage.sync.set({hosts: hh}, function() {
+    chrome.tabs.query(
+        {active: true, currentWindow: true},
+          tabs => {
+          var u = tabs[0].url
+          uu = new URL(u)
+          multilog(`added ${uu.origin}`)
+          multilog(`added ${uu.hostname}`)
+          multilog(`added ${uu.pathname}`)
+          });
+  });
   })
 };

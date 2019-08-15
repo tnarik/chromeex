@@ -11,7 +11,8 @@
     },
     "permissions": ["webNavigation", "nativeMessaging", "activeTab", "declarativeContent", "storage", "notifications", "downloads"],
     //"omnibox": {"keyword": "cnf"}, // Would listen to omnibox.onInputEntered
-    "page_action": {
+//    "page_action": {
+    "browser_action": {
         "default_title": "keep track of those pesky Confluence pages",
         "default_popup": "popup.html",
         "default_icon": {

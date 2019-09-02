@@ -4,7 +4,33 @@
 
 'use strict';
 
+let thingiesGotten = []
+const refresh = () => {
+   chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
+      { cmd: "getList" },
+      function(response) {
+       if (response !== undefined) {
+         thingiesGotten = response;
+      } else {
+         console.error(chrome.runtime.lastError);
+      }
+   })
+}
+
+chrome.extension.onConnect.addListener( port => {
+   console.log("Connected .....");
+   port.onMessage.addListener( msg => {
+      console.log(msg);
+      if ( msg.question === "known?") {
+         if ( thingiesGotten.includes(msg.url) ) {
+            port.postMessage({response: "known"})
+         }
+      }
+   });
+})
+
 chrome.runtime.onInstalled.addListener(function() {
+   refresh()
    // This is a one-time initialization (setting of values and adding the rules)
    // That means stored domain value changes are disregarded
    chrome.storage.sync.set({color: '#3aa757'}, function() {
@@ -79,7 +105,8 @@ chrome.tabs.onActivated.addListener((data) => {
    console.log(data)
    chrome.tabs.get(data.tabId, (t) => {
       console.log(t)
-      if (t.url.indexOf('a') == -1) {
+      if ( !thingiesGotten.includes(new URL(t.url).origin) ){
+      //if (t.url.indexOf('a') == -1) {
          chrome.browserAction.setIcon({path: {"16": "images/get_started16_grey.png"}})
          chrome.browserAction.setBadgeText({"text": ""}, null);
       } else {

@@ -5,13 +5,18 @@ let dload_dload = document.getElementById('dload_dload');
 let talk_app = document.getElementById('talk_app');
 let talk_native = document.getElementById('talk_native');
 let add_this = document.getElementById('add_this');
+let new_conflu = document.getElementById('new_conflu');
+let existing_conflu = document.getElementById('existing_conflu');
+
+
+let baseurl = document.getElementById('baseurl');
+let activeUrl = ""
 
 chrome.storage.sync.get('color', function(data) {
    changeColor.style.backgroundColor = data.color;
    changeColor.setAttribute('value', data.color);
 });
 
-let new_conflu = document.getElementById('new_conflu')
 new_conflu.style.display = 'block';
 
 let multilog = function(message) {
@@ -91,14 +96,34 @@ talk_app.onclick = function(element) {
   chrome.runtime.sendMessage('njammkdfbnolefjpfnckcdcbgafjggkb', { launch: true });
 };
 
+const extractConfluenceBase = (andthen) => {
+  // Get the base url instead of the main URL: metadata confluence-base-url
+  chrome.tabs.executeScript(
+          {code: 'try{ document.querySelector("meta[name=\'confluence-base-url\']").getAttribute("content"); }catch(error){ window.location.origin}'},
+          results => { 
+              console.log(results);
+              activeUrl = results[0]
+              baseurl.textContent = activeUrl
+              andthen()
+          });
+}
+
+
 talk_native.onclick = function(element) {
   multilog('talk to native');
 
-  //var port = chrome.runtime.connectNative('uk.co.lecafeautomatique.confla');
+
+  let username = document.getElementById('username').value;
+  let password = document.getElementById('password').value;
+
   chrome.storage.sync.get('test', result => {
     chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
-      //{ text: "Hello" },
-      result.test,
+      { cmd: "addSite", site: {
+          site: activeUrl,
+          username: username,
+          password: password,
+      } },
+      //result.test,
       function(response) {
         if (response !== undefined) {
           console.log("Received " + response);
@@ -108,10 +133,26 @@ talk_native.onclick = function(element) {
         }
       })
   })
+  /*
+  //var port = chrome.runtime.connectNative('uk.co.lecafeautomatique.confla');
+  chrome.storage.sync.get('test', result => {
+    chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
+      { cmd: "getList" },
+      //result.test,
+      function(response) {
+        if (response !== undefined) {
+          console.log("Received " + response);
+          console.log(response);
+        } else {
+          console.error(chrome.runtime.lastError);
+        }
+      })
+  })
+  */
 };
 
 add_this.onclick = function(element) {
-  multilog('adding a host');
+  multilog('adding a host=> ');
 
   let username = document.getElementById('username').value;
   let password = document.getElementById('password').value;
@@ -121,18 +162,43 @@ add_this.onclick = function(element) {
     hh = result.hosts || []
     multilog(hh)
 
-  multilog(`hh ${hh}`)
-  hh.push('this one')
-  chrome.storage.sync.set({hosts: hh}, function() {
     chrome.tabs.query(
         {active: true, currentWindow: true},
-          tabs => {
-          var u = tabs[0].url
-          uu = new URL(u)
-          multilog(`added ${uu.origin}`)
-          multilog(`added ${uu.hostname}`)
-          multilog(`added ${uu.pathname}`)
-          });
-  });
+        tabs => {
+            if ( result.hosts.includes(tabs[0].url) ) {
+              new_conflu.style.display = 'none';
+            } else {
+              new_conflu.style.display = 'block';
+              var u = tabs[0].url
+              hh.push(u)
+              chrome.storage.sync.set({hosts: hh}, function() {} );
+              uu = new URL(u)
+              multilog(`added ${uu.origin}`)
+              multilog(`added ${uu.hostname}`)
+              multilog(`added ${uu.pathname}`)
+            }
+    });
   })
 };
+
+extractConfluenceBase( () => {
+  var port = chrome.extension.connect({
+    name: "Initial Communication From POPUP"
+  });
+  port.postMessage({question: "known?", url: activeUrl});
+  port.onMessage.addListener(msg => {
+    console.log(msg);
+    if (msg.response === "known") {
+      // fill data
+      // hide 
+      new_conflu.style.display = "none"
+      existing_conflu.style.display = "default"
+      // show modification icon
+    } else {
+      new_conflu.style.display = "default"
+      existing_conflu.style.display = "none"
+    }
+  })
+})
+
+

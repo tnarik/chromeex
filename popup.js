@@ -1,10 +1,5 @@
 let changeColor = document.getElementById('changeColor');
-//let showFolder = document.getElementById('showFolder');
-//let dload = document.getElementById('dload');
-//let dload_dload = document.getElementById('dload_dload');
-//let talk_app = document.getElementById('talk_app');
 let talk_native = document.getElementById('talk_native');
-//let add_this = document.getElementById('add_this');
 let new_conflu = document.getElementById('new_conflu');
 let existing_conflu = document.getElementById('existing_conflu');
 
@@ -58,46 +53,6 @@ changeColor.onclick = function(element) {
     message: 'yas!'
    }, function(notificationId) {});
 };
-
-//showFolder.onclick = function(element) {
-//  multilog('foder shown');
-//};
-
-// The following approach creates the blob, and provides/click on a link for downloading
-//dload.onclick = function(element) {
-//  multilog('downloading');
-//  var text = "Some sample text, as an exercise";
-//  var file = new Blob([text], {type: 'text/plain'}); // but could even be 'somethingelse'
-//  var url = URL.createObjectURL(file);
-//  multilog(url);
-//  var a = document.createElement("a");
-//  a.href = url;
-//  a.download = "sample.txt";
-//  document.body.appendChild(a);
-//  a.click();
-//};
-
-
-// This is a different way of triggering the download, via the 'downloads' API
-//dload_dload.onclick = function(element) {
-//  multilog('dload appendChild');
-//
-//  var text = "Some sample text, as an exercise";
-//  var file = new Blob([text], {type: 'text/plain'}); // but could even be 'somethingelse'
-//  var url = URL.createObjectURL(file);
-//
-//  chrome.downloads.download(
-//    { url: url,
-//      filename: "sample_using_downloads.txt",
-//      saveAs: false },
-//    function(id) {});
-//};
-
-// Chrome Apps was an idea but it is deprecated, so better move to fully native Apps (which can access the real filesystem)
-//talk_app.onclick = function(element) {
-//  multilog('talk to app');
-//  chrome.runtime.sendMessage('njammkdfbnolefjpfnckcdcbgafjggkb', { launch: true });
-//};
 
 const extractConfluenceBase = (andthen) => {
   // Get the base url instead of the main URL: metadata confluence-base-url

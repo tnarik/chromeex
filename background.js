@@ -23,7 +23,10 @@ chrome.extension.onConnect.addListener( port => {
       console.log(msg);
       if ( msg.question === "known?") {
          if ( thingiesGotten.includes(msg.url) ) {
-            port.postMessage({response: "known"})
+            port.postMessage({response: "known", site: {
+               username: "asdf",
+               password: "123"
+            }})
          }
       }
    });

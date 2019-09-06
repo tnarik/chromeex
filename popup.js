@@ -4,7 +4,7 @@ let dload = document.getElementById('dload');
 let dload_dload = document.getElementById('dload_dload');
 let talk_app = document.getElementById('talk_app');
 let talk_native = document.getElementById('talk_native');
-let add_this = document.getElementById('add_this');
+//let add_this = document.getElementById('add_this');
 let new_conflu = document.getElementById('new_conflu');
 let existing_conflu = document.getElementById('existing_conflu');
 
@@ -151,8 +151,10 @@ talk_native.onclick = function(element) {
   */
 };
 
+// This is addition to the Synced storage only
+/*
 add_this.onclick = function(element) {
-  multilog('adding a host=> ');
+  multilog('adding a host => ');
 
   let username = document.getElementById('username').value;
   let password = document.getElementById('password').value;
@@ -180,6 +182,12 @@ add_this.onclick = function(element) {
     });
   })
 };
+*/
+
+existing_conflu.onclick = element => {
+  new_conflu.style.display = "block"
+  //existing_conflu.style.display = "none"
+}
 
 extractConfluenceBase( () => {
   var port = chrome.extension.connect({
@@ -190,12 +198,15 @@ extractConfluenceBase( () => {
     console.log(msg);
     if (msg.response === "known") {
       // fill data
+      document.getElementById('username').value = msg.site.username;
+      document.getElementById('password').value = msg.site.password;
+
       // hide 
       new_conflu.style.display = "none"
-      existing_conflu.style.display = "default"
+      existing_conflu.style.display = "inline-block"
       // show modification icon
     } else {
-      new_conflu.style.display = "default"
+      new_conflu.style.display = "block"
       existing_conflu.style.display = "none"
     }
   })

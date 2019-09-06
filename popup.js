@@ -1,4 +1,4 @@
-let changeColor = document.getElementById('changeColor');
+//let changeColor = document.getElementById('changeColor');
 let talk_native = document.getElementById('talk_native');
 let new_conflu = document.getElementById('new_conflu');
 let existing_conflu = document.getElementById('existing_conflu');
@@ -7,10 +7,10 @@ let existing_conflu = document.getElementById('existing_conflu');
 let baseurl = document.getElementById('baseurl');
 let activeUrl = ""
 
-chrome.storage.sync.get('color', function(data) {
-   changeColor.style.backgroundColor = data.color;
-   changeColor.setAttribute('value', data.color);
-});
+//chrome.storage.sync.get('color', function(data) {
+//   changeColor.style.backgroundColor = data.color;
+//   changeColor.setAttribute('value', data.color);
+//});
 
 new_conflu.style.display = 'block';
 
@@ -38,21 +38,21 @@ let multilog = function(message) {
   });
 };
 
-changeColor.onclick = function(element) {
-  chrome.extension.getBackgroundPage().console.log('changing Color');
-   let color = element.target.value;
-   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-      chrome.tabs.executeScript(
-         tabs[0].id,
-         {code: 'document.body.style.backgroundColor = "' + color + '";'});
-   });
-   chrome.notifications.create('', {
-    type: 'basic',
-    iconUrl: 'images/get_started32.png',
-    title: "changed Color",
-    message: 'yas!'
-   }, function(notificationId) {});
-};
+//changeColor.onclick = function(element) {
+//  chrome.extension.getBackgroundPage().console.log('changing Color');
+//   let color = element.target.value;
+//   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+//      chrome.tabs.executeScript(
+//         tabs[0].id,
+//         {code: 'document.body.style.backgroundColor = "' + color + '";'});
+//   });
+//   chrome.notifications.create('', {
+//    type: 'basic',
+//    iconUrl: 'images/get_started32.png',
+//    title: "changed Color",
+//    message: 'yas!'
+//   }, function(notificationId) {});
+//};
 
 const extractConfluenceBase = (andthen) => {
   // Get the base url instead of the main URL: metadata confluence-base-url

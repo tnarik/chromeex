@@ -55,14 +55,17 @@ let multilog = function(message) {
 //};
 
 const extractConfluenceBase = (andthen) => {
+  multilog("doing the Confluence extraction dance")
   // Get the base url instead of the main URL: metadata confluence-base-url
   chrome.tabs.executeScript(
-          {code: 'try{ document.querySelector("meta[name=\'confluence-base-url\']").getAttribute("content"); }catch(error){ window.location.origin}'},
-          results => { 
-              console.log(results);
-              activeUrl = results[0]
-              baseurl.textContent = activeUrl
-              andthen()
+          {code: 'try { document.querySelector("meta[name=\'confluence-base-url\']").getAttribute("content"); } catch(e){ [window.location.origin] }'},
+          results => {
+              if(chrome.runtime.lastError === undefined) {
+                console.log(results);
+                activeUrl = results[0]
+                baseurl.textContent = activeUrl
+                andthen()
+              }
           });
 }
 
@@ -70,27 +73,36 @@ const extractConfluenceBase = (andthen) => {
 talk_native.onclick = function(element) {
   multilog('talk to native');
 
-
   let username = document.getElementById('username').value;
   let password = document.getElementById('password').value;
 
-  chrome.storage.sync.get('test', result => {
-    chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
-      { cmd: "addSite", site: {
-          site: activeUrl,
-          username: username,
-          password: password,
-      } },
-      //result.test,
-      function(response) {
-        if (response !== undefined) {
-          console.log("Received " + response);
-          console.log(response);
-        } else {
-          console.error(chrome.runtime.lastError);
-        }
-      })
+  site = {url: activeUrl, status: 1}
+  chrome.storage.sync.get('sites', result => {
+    sites = result.sites || []
+    multilog(sites.length)
+    if ( sites.find(s => s.url == site.url ) ) {
+      multilog("Shouldn't be adding this, right?")
+    } else {
+      multilog("Should be a new add")
+    }
+    chrome.storage.sync.set({sites: sites}, () => multilog('Added site') );
   })
+
+  chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
+    { cmd: "addSite", site: {
+        site: activeUrl,
+        username: username,
+        password: password,
+    } },
+    function(response) {
+      if (response !== undefined) {
+        console.log("Received " + response);
+        console.log(response);
+      } else {
+        console.error(chrome.runtime.lastError);
+      }
+    })
+
   /*
   //var port = chrome.runtime.connectNative('uk.co.lecafeautomatique.confla');
   chrome.storage.sync.get('test', result => {
@@ -151,6 +163,8 @@ extractConfluenceBase( () => {
   var port = chrome.extension.connect({
     name: "Initial Communication From POPUP"
   });
+      multilog(activeUrl)
+
   port.postMessage({question: "known?", url: activeUrl});
   port.onMessage.addListener(msg => {
     console.log(msg);
@@ -158,12 +172,19 @@ extractConfluenceBase( () => {
       // fill data
       document.getElementById('username').value = msg.site.username;
       document.getElementById('password').value = msg.site.password;
-
-      // hide 
-      new_conflu.style.display = "none"
-      existing_conflu.style.display = "inline-block"
-      // show modification icon
+      document.getElementById('localPath').value = msg.site.localPath;
+      multilog(msg.status)
+      if ( msg.status == 3 ) {
+        // site info completed
+        new_conflu.style.display = "none"
+        existing_conflu.style.display = "inline-block"
+      } else {
+        // site info missing (just known or partial)
+        new_conflu.style.display = "block"
+        existing_conflu.style.display = "none"
+      }
     } else {
+      // site info new
       new_conflu.style.display = "block"
       existing_conflu.style.display = "none"
     }

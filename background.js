@@ -4,17 +4,41 @@
 
 'use strict';
 
+let thingieStatus = 0;
 let thingiesGotten = []
-const refresh = () => {
+const syncSites = () => {
    chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
-      { cmd: "getList" },
+      { cmd: "getListSummary" },
       function(response) {
        if (response !== undefined) {
          thingiesGotten = response;
+         chrome.storage.sync.set({sites: response}, null );
       } else {
          console.error(chrome.runtime.lastError);
       }
    })
+}
+
+const siteMark = (site) => {
+   if ( site === undefined ){
+      //if (t.url.indexOf('a') == -1) {
+         chrome.browserAction.setIcon({path: {"16": "images/host_unknown.png"}})
+         chrome.browserAction.setBadgeText({"text": ""}, null);
+         chrome.browserAction.setPopup({popup: "popup.html"});
+         thingieStatus = 0;
+//      } else if ( site.localPath.length > 0 ) {
+      } else if ( site.status === 3 ) {
+         chrome.browserAction.setIcon({path: {"16": "images/host_tracked.png"}})
+         //chrome.browserAction.setBadgeText({"text": `${t.url.indexOf('a')}`}, null);
+         chrome.browserAction.setBadgeText({"text": "100"}, null);
+         chrome.browserAction.setPopup({popup: "popup_tracked.html"});
+         thingieStatus = site.status;
+      } else {
+         chrome.browserAction.setIcon({path: {"16": "images/host_partial.png"}})
+         chrome.browserAction.setBadgeText({"text": "0"}, null);
+         chrome.browserAction.setPopup({popup: "popup.html"});
+         thingieStatus = site.status;
+      }
 }
 
 chrome.extension.onConnect.addListener( port => {
@@ -22,64 +46,37 @@ chrome.extension.onConnect.addListener( port => {
    port.onMessage.addListener( msg => {
       console.log(msg);
       if ( msg.question === "known?") {
-         if ( thingiesGotten.includes(msg.url) ) {
-            port.postMessage({response: "known", site: {
-               username: "asdf",
-               password: "123"
-            }})
+         let aa = thingiesGotten.find(s => s.url == msg.url) 
+         siteMark(aa)
+
+         if ( thingieStatus > 0 ) {
+            //.filter(s => s.url == "https://auth0.com")
+            //.find(s => s.url == "https://auth0.com")
+            //if ( thingiesGotten.includes(msg.url) ) {
+            //let aa = thingiesGotten.find(s => s.url == msg.url) 
+            //siteMark(aa)
+            if ( aa !== undefined ) {
+               port.postMessage({response: "known",
+                  status: thingieStatus,
+                  site: {
+                  username: "background_username", // aa.username,//
+                  password: "background_password",
+                  localPath: "/" // aa.localPath
+               }})
+            }
+         } else {
+            port.postMessage({response: "?"})
          }
       }
    });
 })
 
 chrome.runtime.onInstalled.addListener(function() {
-   refresh()
+   syncSites()
    // This is a one-time initialization (setting of values and adding the rules)
    // That means stored domain value changes are disregarded
    chrome.storage.sync.set({color: '#3aa757'}, function() {
       console.log("The color is green.");
-   });
-   chrome.storage.sync.set({tracked_domain: 'developer.chrome.com'}, function() {
-      console.log("domain tracked");
-   });
-
-   let thingies = [
-      {
-         url: 'developer.chrome.com',
-         path: "path1"
-      },
-      {
-         url: 'bombmagazine.org',
-         path: "path2"
-      }
-   ]
-
-   chrome.storage.sync.set({thingies: thingies}, function() {
-      console.log("thingies added");
-   });
-
-   chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-      //chrome.browserAction.setBadgeText({"text": "1"}, null);
-      chrome.storage.sync.get('tracked_domain', function(data) {
-         console.log(data.tracked_domain);
-
-         var rule_active = {
-            conditions: [
-               new chrome.declarativeContent.PageStateMatcher({
-                  pageUrl: {hostEquals: data.tracked_domain}
-               }),
-               new chrome.declarativeContent.PageStateMatcher({
-                  pageUrl: {hostEquals: "bombmagazine.org"}
-               })
-            ],
-            actions: [
-               //console.log("matched URL")
-               //new chrome.declarativeContent.ShowPageAction()
-            ]
-         }
-
-         chrome.declarativeContent.onPageChanged.addRules([rule_active]);
-      });
    });
 });
 
@@ -104,22 +101,21 @@ chrome.runtime.onInstalled.addListener(function() {
 //   })
 //});
 
-chrome.tabs.onActivated.addListener((data) => {
+chrome.tabs.onActivated.addListener( data => {
    console.log(data)
    chrome.tabs.get(data.tabId, (t) => {
       console.log(t)
-      if ( !thingiesGotten.includes(new URL(t.url).origin) ){
-      //if (t.url.indexOf('a') == -1) {
-         chrome.browserAction.setIcon({path: {"16": "images/get_started16_grey.png"}})
-         chrome.browserAction.setBadgeText({"text": ""}, null);
-      } else {
-         chrome.browserAction.setIcon({path: {"16": "images/get_started16.png"}})
-         chrome.browserAction.setBadgeText({"text": `${t.url.indexOf('a')}`}, null);
-      }
+      let site = thingiesGotten.find(s => s.url == new URL(t.url).origin)
+      siteMark(site)
    })
-   //chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-   //   console.log(`updated ${tabId}`);
-   //   console.log(changeInfo)
-   //   console.log(tab)
-   //});
+   
+   chrome.tabs.onUpdated.addListener((tabId, changeInfo, t) => {
+      //console.log(`updated ${tabId}`);
+      //console.log(changeInfo)
+      //console.log(t)
+      if ( data.tabId == tabId ) {
+         let site = thingiesGotten.find(s => s.url == new URL(t.url).origin)
+         siteMark(site)
+      }
+   });
 })

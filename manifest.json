@@ -11,7 +11,8 @@
     },
     "permissions": ["webNavigation", "nativeMessaging", "activeTab",
                     "tabs",
-                    "declarativeContent", "storage", "notifications"],
+                    "declarativeContent", "storage", "notifications",
+                    "identity", "identity.email"],
     //"omnibox": {"keyword": "cnf"}, // Would listen to omnibox.onInputEntered
 //    "page_action": {
     "browser_action": {

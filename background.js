@@ -12,8 +12,9 @@ let multilog = function(message) {
 
 let thingiesGotten = []
 const syncSites = () => {
+  chrome.identity.getProfileUserInfo(userInfo =>{
    chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
-      { cmd: "getListSummary" },
+      { cmd: "getListSummary", user_id: userInfo.id},
       response => 
         new Promise((resolve, reject) => {
 
@@ -36,6 +37,7 @@ const syncSites = () => {
       }
    })
   )
+ })
 }
 
 const getThingies = () => {
@@ -135,8 +137,10 @@ chrome.extension.onConnect.addListener( port => {
          //let site = findSite(msg.site.url)
          //if ( site === undefined ) {
             multilog("adding Site")
+  chrome.identity.getProfileUserInfo(userInfo =>{
+
             chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
-               { cmd: "addSite", site: msg.site },
+               { cmd: "addSite", site: msg.site, user_id: userInfo.id},
                function(response) {
                  if (response !== undefined) {
                    multilog("Received response on added site");
@@ -152,7 +156,7 @@ chrome.extension.onConnect.addListener( port => {
                  }
                 port.postMessage({response: "ok"})
             })
-         //}
+         })
       }
 
    });
@@ -167,13 +171,13 @@ chrome.runtime.onInstalled.addListener(function() {
    });
 });
 
-chrome.runtime.onSuspend.addListener(function() {
-   multilog("Suspension in progress")
-});
-
-chrome.runtime.onSuspendCanceled.addListener(function() {
-   multilog("Suspension CANCELLED")
-});
+//chrome.runtime.onSuspend.addListener(function() {
+//   multilog("Suspension in progress")
+//});
+//
+//chrome.runtime.onSuspendCanceled.addListener(function() {
+//   multilog("Suspension CANCELLED")
+//});
 
 // Other event listeners should be registered here.
 //
@@ -226,8 +230,10 @@ chrome.browserAction.onClicked.addListener(tab => {
       chrome.storage.sync.set({pages: result.pages}, () => {
 
          // Sync the whole lot with the Native App
+  chrome.identity.getProfileUserInfo(userInfo =>{
+
          chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
-            { cmd: "pushPages", pages: result.pages },
+            { cmd: "pushPages", pages: result.pages, user_id: userInfo.id },
             function(response) {
                if (response !== undefined) {
                   // synced
@@ -235,6 +241,7 @@ chrome.browserAction.onClicked.addListener(tab => {
                   console.error(chrome.runtime.lastError);
                }
          })
+       })
 
       });
    });

@@ -58,10 +58,13 @@ const extractConfluenceBase = (andthen) => {
   multilog("doing the Confluence extraction dance")
   // Get the base url instead of the main URL: metadata confluence-base-url
   chrome.tabs.executeScript(
-          {code: 'try { document.querySelector("meta[name=\'confluence-base-url\']").getAttribute("content"); } catch(e){ [window.location.origin] }'},
+          {code: `try { document.querySelector("meta[name=\'confluence-base-url\']").getAttribute("content"); 
+                  } catch(e) { window.location.origin
+                  }`},
           results => {
               if(chrome.runtime.lastError === undefined) {
                 console.log(results);
+                console.log("got a result");
                 activeUrl = results[0]
                 baseurl.textContent = activeUrl
                 andthen()
@@ -70,55 +73,35 @@ const extractConfluenceBase = (andthen) => {
 }
 
 
+// Add Site should probably happen via the background (so background call first)
 talk_native.onclick = function(element) {
   multilog('talk to native');
 
   let username = document.getElementById('username').value;
   let password = document.getElementById('password').value;
+  let localPath = document.getElementById('localPath').value;
 
-  site = {url: activeUrl, status: 1}
-  chrome.storage.sync.get('sites', result => {
-    sites = result.sites || []
-    multilog(sites.length)
-    if ( sites.find(s => s.url == site.url ) ) {
-      multilog("Shouldn't be adding this, right?")
-    } else {
-      multilog("Should be a new add")
-    }
-    chrome.storage.sync.set({sites: sites}, () => multilog('Added site') );
-  })
+//  chrome.storage.sync.get({sites: []}, result => {
+//    multilog(result.sites.length)
+//    if ( result.sites.find(s => s.url == activeUrl ) ) {
+//      multilog("Shouldn't be adding this, right?")
+//    } else {
+//      multilog("Should be a new add")
+//    }
+//    //chrome.storage.sync.set({psites: result.sites}, () => multilog('Added site') );
+//  })
 
-  chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
-    { cmd: "addSite", site: {
-        site: activeUrl,
+  var port = chrome.extension.connect({
+    name: "Initial Communication From POPUP"
+  });
+  port.postMessage({question: "addSite?", site: {
+        url: activeUrl,
         username: username,
         password: password,
-    } },
-    function(response) {
-      if (response !== undefined) {
-        console.log("Received " + response);
-        console.log(response);
-      } else {
-        console.error(chrome.runtime.lastError);
-      }
-    })
-
-  /*
-  //var port = chrome.runtime.connectNative('uk.co.lecafeautomatique.confla');
-  chrome.storage.sync.get('test', result => {
-    chrome.runtime.sendNativeMessage('uk.co.lecafeautomatique.confla',
-      { cmd: "getList" },
-      //result.test,
-      function(response) {
-        if (response !== undefined) {
-          console.log("Received " + response);
-          console.log(response);
-        } else {
-          console.error(chrome.runtime.lastError);
-        }
-      })
-  })
-  */
+        localPath: localPath
+    }
+  });
+  port.onMessage.addListener(null);
 };
 
 // This is addition to the Synced storage only
@@ -143,7 +126,7 @@ add_this.onclick = function(element) {
               new_conflu.style.display = 'block';
               var u = tabs[0].url
               hh.push(u)
-              chrome.storage.sync.set({hosts: hh}, function() {} );
+              chrome.storage.sync.s e t({hosts: hh}, function() {} );
               uu = new URL(u)
               multilog(`added ${uu.origin}`)
               multilog(`added ${uu.hostname}`)
@@ -163,7 +146,7 @@ extractConfluenceBase( () => {
   var port = chrome.extension.connect({
     name: "Initial Communication From POPUP"
   });
-      multilog(activeUrl)
+  multilog(activeUrl)
 
   port.postMessage({question: "known?", url: activeUrl});
   port.onMessage.addListener(msg => {
